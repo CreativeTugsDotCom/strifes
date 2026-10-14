@@ -1,0 +1,902 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Strife's Air Conditioning & Heating | Houston HVAC & Mechanical</title>
+    <meta name="description" content="Professional air conditioning and heating solutions for residential and commercial properties in Houston, Texas. Specializing in HVAC systems, installations, and ductwork.">
+    
+    <!-- Preconnect & Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;500;600;700&family=Inter:wght@300;400;500;600&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Tailwind CSS Setup -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        graphite: '#272B2D',
+                        mineral: '#E9E8E2',
+                        copper: '#B86D4B',
+                        yellow: '#E7C957',
+                        steel: '#8D999C',
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        display: ['Space Grotesk', 'sans-serif'],
+                        mono: ['Barlow Condensed', 'monospace'],
+                    },
+                    spacing: {
+                        '18': '4.5rem',
+                        '22': '5.5rem',
+                    },
+                    aspectRatio: {
+                        'tall': '3 / 4',
+                        'wide': '16 / 9',
+                        'photo': '4 / 3',
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- Custom CSS for Animations & Mechanical Grid Elements -->
+    <style>
+        body {
+            background-color: #E9E8E2;
+            color: #272B2D;
+            overflow-x: hidden;
+        }
+
+        /* Registration Marks / Crosshairs */
+        .crosshair-tl::before, .crosshair-tr::before, .crosshair-bl::before, .crosshair-br::before {
+            content: '';
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            pointer-events: none;
+            z-index: 10;
+        }
+        .crosshair-tl::before { top: 0; left: 0; border-top: 1px solid #8D999C; border-left: 1px solid #8D999C; }
+        .crosshair-tr::before { top: 0; right: 0; border-top: 1px solid #8D999C; border-right: 1px solid #8D999C; }
+        .crosshair-bl::before { bottom: 0; left: 0; border-bottom: 1px solid #8D999C; border-left: 1px solid #8D999C; }
+        .crosshair-br::before { bottom: 0; right: 0; border-bottom: 1px solid #8D999C; border-right: 1px solid #8D999C; }
+
+        /* Fine grid background for specific sections */
+        .bg-grid {
+            background-image: 
+                linear-gradient(to right, rgba(141, 153, 156, 0.1) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(141, 153, 156, 0.1) 1px, transparent 1px);
+            background-size: 40px 40px;
+        }
+        .bg-grid-dark {
+            background-image: 
+                linear-gradient(to right, rgba(233, 232, 226, 0.05) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(233, 232, 226, 0.05) 1px, transparent 1px);
+            background-size: 40px 40px;
+        }
+
+        /* SVG Line Animation */
+        .draw-line {
+            stroke-dasharray: 1000;
+            stroke-dashoffset: 1000;
+        }
+        .animate-draw.draw-line {
+            animation: drawLine 3s ease-out forwards;
+        }
+        @keyframes drawLine {
+            to { stroke-dashoffset: 0; }
+        }
+
+        /* Reveal Animation */
+        .reveal-box {
+            clip-path: polygon(0 0, 0 0, 0 100%, 0% 100%);
+            transition: clip-path 1.2s cubic-bezier(0.77, 0, 0.175, 1);
+        }
+        .reveal-box.active {
+            clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
+        }
+
+        /* Image hover zoom wrapper */
+        .img-wrap { overflow: hidden; position: relative; }
+        .img-wrap img { transition: transform 0.6s ease; }
+        .img-wrap:hover img { transform: scale(1.05); }
+
+        /* Custom Form Input */
+        .mech-input {
+            width: 100%;
+            background: transparent;
+            border: none;
+            border-bottom: 2px solid #8D999C;
+            padding: 0.75rem 0;
+            color: #272B2D;
+            font-family: 'Inter', sans-serif;
+            transition: all 0.3s ease;
+        }
+        .mech-input:focus {
+            outline: none;
+            border-bottom-color: #E7C957;
+        }
+        .mech-input::placeholder { color: #8D999C; }
+
+        /* Service Index Hover */
+        .service-row { border-bottom: 1px solid #8D999C; transition: background-color 0.3s; }
+        .service-row:hover { background-color: rgba(141, 153, 156, 0.1); }
+        .service-arrow { transform: translateX(0); transition: transform 0.3s; }
+        .service-row:hover .service-arrow { transform: translateX(10px); color: #E7C957; }
+
+        /* Lightbox */
+        #lightbox {
+            opacity: 0; pointer-events: none; transition: opacity 0.3s ease;
+        }
+        #lightbox.active {
+            opacity: 1; pointer-events: auto;
+        }
+
+        /* Header Scroll State */
+        header { transition: all 0.3s ease; }
+        header.scrolled { padding-top: 0.5rem; padding-bottom: 0.5rem; box-shadow: 0 4px 20px rgba(0,0,0,0.05); }
+
+        /* Logo Startup Animation */
+        @keyframes logoMainReveal {
+            0% { opacity: 0; transform: translateY(10px); filter: blur(2px); }
+            100% { opacity: 1; transform: translateY(0); filter: blur(0); }
+        }
+        @keyframes logoDotPop {
+            0% { opacity: 0; transform: scale(0.5); }
+            60% { transform: scale(1.3); opacity: 1; filter: drop-shadow(0 0 4px rgba(184, 109, 75, 0.6)); }
+            100% { opacity: 1; transform: scale(1); filter: drop-shadow(0 0 0 transparent); }
+        }
+        @keyframes logoSubDrop {
+            0% { opacity: 0; transform: translateY(-6px); }
+            100% { opacity: 1; transform: translateY(0); }
+        }
+        .anim-logo-main { display: inline-block; opacity: 0; animation: logoMainReveal 0.8s cubic-bezier(0.2, 0.8, 0.2, 1) 0.1s forwards; }
+        .anim-logo-dot { display: inline-block; opacity: 0; animation: logoDotPop 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) 0.45s forwards; }
+        .anim-logo-sub { opacity: 0; animation: logoSubDrop 0.6s cubic-bezier(0.2, 0.8, 0.2, 1) 0.6s forwards; }
+    </style>
+</head>
+<body class="antialiased font-sans selection:bg-yellow selection:text-graphite">
+
+    <!-- HEADER -->
+    <header id="main-header" class="fixed w-full top-0 z-50 bg-mineral border-b border-graphite/20">
+        <div class="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-20 md:h-24 transition-all duration-300" id="header-inner">
+                
+                <!-- Logo -->
+                <div class="flex-shrink-0">
+                    <a href="#" class="block font-display font-bold text-2xl tracking-tighter uppercase text-graphite group">
+                        <span class="anim-logo-main">STRIFE'S</span><span class="text-copper anim-logo-dot">.</span>
+                        <span class="block text-[0.65rem] font-mono tracking-widest text-steel mt-[-4px] anim-logo-sub">AC & HEATING</span>
+                    </a>
+                </div>
+
+                <!-- Desktop Nav -->
+                <nav class="hidden lg:flex space-x-8 lg:space-x-12 absolute left-1/2 transform -translate-x-1/2">
+                    <a href="#services" class="text-sm font-semibold tracking-widest uppercase hover:text-copper transition-colors">Services</a>
+                    <a href="#gallery" class="text-sm font-semibold tracking-widest uppercase hover:text-copper transition-colors">Projects</a>
+                    <a href="#about" class="text-sm font-semibold tracking-widest uppercase hover:text-copper transition-colors">About</a>
+                    <a href="#contact" class="text-sm font-semibold tracking-widest uppercase hover:text-copper transition-colors">Contact</a>
+                </nav>
+
+                <!-- Phone Block Desktop -->
+                <div class="hidden md:flex items-center">
+                    <a href="tel:+12817415548" class="group flex items-center bg-graphite text-mineral py-3 px-6 hover:bg-copper transition-colors">
+                        <span class="font-mono text-lg tracking-wider mr-3">(281) 741-5548</span>
+                        <svg class="w-4 h-4 text-yellow group-hover:text-mineral transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="square" stroke-linejoin="miter" stroke-width="2" d="M4 4h16v16M20 4L4 20"></path></svg>
+                    </a>
+                </div>
+
+                <!-- Mobile Menu Button -->
+                <div class="md:hidden flex items-center">
+                    <button id="mobile-menu-btn" class="text-graphite focus:outline-none p-2">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="square" stroke-linejoin="miter" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Mobile Menu Overlay -->
+        <div id="mobile-menu" class="hidden absolute top-full left-0 w-full bg-graphite text-mineral border-t border-mineral/20 shadow-xl">
+            <nav class="flex flex-col px-6 py-8 space-y-6">
+                <a href="#services" class="text-xl font-display uppercase tracking-wider mobile-link">Services</a>
+                <a href="#gallery" class="text-xl font-display uppercase tracking-wider mobile-link">Projects</a>
+                <a href="#about" class="text-xl font-display uppercase tracking-wider mobile-link">About</a>
+                <a href="#contact" class="text-xl font-display uppercase tracking-wider mobile-link">Contact</a>
+                <a href="tel:+12817415548" class="text-yellow font-mono text-xl tracking-wider pt-4 border-t border-mineral/20 mobile-link">CALL (281) 741-5548 ↗</a>
+            </nav>
+        </div>
+    </header>
+
+    <!-- HERO SECTION -->
+    <section class="pt-28 pb-12 md:pt-32 md:pb-16 lg:pt-36 lg:pb-20 bg-mineral relative overflow-hidden bg-grid crosshair-tl crosshair-tr">
+        <div class="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+            
+            <!-- Grid Layout -->
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-0 relative">
+                
+                <!-- Typography Content (Left/Overlapping) -->
+                <div class="lg:col-span-6 lg:col-start-1 lg:row-start-1 z-20 flex flex-col justify-center lg:pr-12 pt-4 lg:pt-0 lg:-translate-y-6">
+                    
+                    <div class="flex items-center mb-6 space-x-4">
+                        <span class="w-8 h-[2px] bg-copper"></span>
+                        <span class="font-mono text-sm tracking-widest text-graphite uppercase">Houston, Texas / HVAC & Mechanical</span>
+                    </div>
+
+                    <h1 class="font-display text-5xl sm:text-6xl md:text-7xl lg:text-[5.5rem] leading-[0.95] font-bold text-graphite mb-6 uppercase tracking-tighter">
+                        Built Around<br>
+                        <span class="relative">
+                            Better Comfort.
+                            <!-- Animated Line under text -->
+                            <svg class="absolute -bottom-2 left-0 w-full h-2 text-yellow" preserveAspectRatio="none" viewBox="0 0 100 10" fill="none">
+                                <line x1="0" y1="5" x2="100" y2="5" stroke="currentColor" stroke-width="4" class="draw-line animate-on-scroll" />
+                            </svg>
+                        </span>
+                    </h1>
+
+                    <p class="text-lg md:text-xl text-graphite/80 max-w-lg mb-10 font-light border-l-2 border-graphite/20 pl-4">
+                        Air conditioning and heating solutions for residential and commercial properties, including HVAC system work, installations, and ductwork-related projects.
+                    </p>
+
+                    <div class="flex flex-col sm:flex-row gap-4 items-start">
+                        <a href="#contact" class="bg-yellow text-graphite font-display font-bold uppercase tracking-widest py-4 px-8 hover:bg-graphite hover:text-yellow transition-colors flex items-center">
+                            Request Service
+                            <svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="square" stroke-linejoin="miter" stroke-width="2" d="M4 4h16v16M20 4L4 20"></path></svg>
+                        </a>
+                        <a href="tel:+12817415548" class="font-mono text-lg font-semibold tracking-wider py-4 px-4 hover:text-copper transition-colors">
+                            CALL THE TEAM
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Image Container (Right/Spanning) -->
+                <div class="lg:col-span-8 lg:col-start-5 lg:row-start-1 relative mt-10 lg:mt-0">
+                    <!-- Graphic Panel Overlap -->
+                    <div class="absolute -top-6 -left-6 w-32 h-32 md:w-48 md:h-48 bg-copper z-10 mix-blend-multiply opacity-90 hidden md:block border-2 border-graphite"></div>
+                    
+                    <div class="img-wrap reveal-box w-full aspect-video lg:aspect-[4/3] bg-graphite relative z-0 border border-graphite/20 shadow-2xl">
+                        <!-- High-quality industrial HVAC image -->
+                        <img src="https://images.unsplash.com/photo-1621905252507-b35492cc74b4?ixlib=rb-4.0.3&auto=format&fit=crop&w=1600&q=80" alt="HVAC Technician inspecting commercial equipment" class="w-full h-full object-cover object-center opacity-90 mix-blend-luminosity">
+                        <!-- Technical overlay marks -->
+                        <div class="absolute top-4 right-4 font-mono text-xs text-mineral/50 tracking-widest">FIG. 01 // MECH-SYS</div>
+                        <div class="absolute bottom-4 left-4 font-mono text-xs text-mineral/50 tracking-widest">SYS. ACTIVE</div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- TRUST BAND -->
+    <section class="bg-graphite border-y border-mineral/10 relative z-20">
+        <div class="max-w-[1400px] mx-auto">
+            <div class="grid grid-cols-2 md:grid-cols-4 divide-x divide-y md:divide-y-0 divide-yellow/30">
+                <div class="px-6 py-8 flex flex-col justify-center items-center text-center group hover:bg-mineral/5 transition-colors">
+                    <span class="font-mono text-yellow text-sm tracking-widest mb-2 opacity-70 group-hover:opacity-100 transition-opacity">01</span>
+                    <span class="font-display text-mineral font-semibold uppercase tracking-wider text-sm md:text-base">Residential<br>HVAC</span>
+                </div>
+                <div class="px-6 py-8 flex flex-col justify-center items-center text-center group hover:bg-mineral/5 transition-colors">
+                    <span class="font-mono text-yellow text-sm tracking-widest mb-2 opacity-70 group-hover:opacity-100 transition-opacity">02</span>
+                    <span class="font-display text-mineral font-semibold uppercase tracking-wider text-sm md:text-base">Commercial<br>Mechanical Work</span>
+                </div>
+                <div class="px-6 py-8 flex flex-col justify-center items-center text-center group hover:bg-mineral/5 transition-colors">
+                    <span class="font-mono text-yellow text-sm tracking-widest mb-2 opacity-70 group-hover:opacity-100 transition-opacity">03</span>
+                    <span class="font-display text-mineral font-semibold uppercase tracking-wider text-sm md:text-base">Heating &<br>Air Conditioning</span>
+                </div>
+                <div class="px-6 py-8 flex flex-col justify-center items-center text-center group hover:bg-mineral/5 transition-colors">
+                    <span class="font-mono text-yellow text-sm tracking-widest mb-2 opacity-70 group-hover:opacity-100 transition-opacity">04</span>
+                    <span class="font-display text-mineral font-semibold uppercase tracking-wider text-sm md:text-base">Ductwork &<br>Installation</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- SERVICES INDEX -->
+    <section id="services" class="py-24 md:py-32 bg-mineral relative crosshair-bl crosshair-br">
+        <div class="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8">
+            
+            <div class="mb-16 md:mb-24 flex flex-col md:flex-row md:items-end justify-between gap-8 border-b border-graphite/20 pb-8">
+                <div class="max-w-2xl">
+                    <h2 class="font-display text-4xl md:text-5xl lg:text-6xl font-bold uppercase tracking-tighter text-graphite mb-6">What Needs To Work Better?</h2>
+                    <p class="text-lg text-graphite/80 font-light border-l-2 border-copper pl-4">
+                        From existing HVAC systems to new mechanical installations, explore the type of work you need and get in touch to discuss your project.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Service List -->
+            <div class="flex flex-col w-full border-t border-graphite/20">
+                
+                <!-- Service 01 -->
+                <div class="service-row py-10 md:py-16 grid grid-cols-1 md:grid-cols-12 gap-8 items-center cursor-pointer group" onclick="document.getElementById('service-select').value='AC Service'; window.location.href='#contact';">
+                    <div class="md:col-span-2">
+                        <span class="font-mono text-6xl md:text-7xl lg:text-8xl text-graphite/20 font-bold group-hover:text-copper transition-colors">01</span>
+                    </div>
+                    <div class="md:col-span-5 flex flex-col">
+                        <h3 class="font-display text-2xl md:text-3xl font-bold uppercase text-graphite mb-4">Air Conditioning Service</h3>
+                        <p class="text-graphite/70 mb-6 font-light">Discuss air-conditioning problems and explore the appropriate service options for your existing equipment.</p>
+                        <span class="font-mono font-semibold tracking-widest text-sm flex items-center text-graphite">
+                            DISCUSS THIS SERVICE
+                            <svg class="w-4 h-4 ml-2 service-arrow" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="square" stroke-linejoin="miter" stroke-width="2" d="M4 4h16v16M20 4L4 20"></path></svg>
+                        </span>
+                    </div>
+                    <div class="md:col-span-5 h-48 md:h-64 img-wrap border border-graphite/20">
+                        <img src="https://raw.githubusercontent.com/CreativeTugsDotCom/PL/refs/heads/main/Screenshot%202026-10-13%20234628.png" alt="AC Service" class="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-500">
+                    </div>
+                </div>
+
+                <!-- Service 02 -->
+                <div class="service-row py-10 md:py-16 grid grid-cols-1 md:grid-cols-12 gap-8 items-center cursor-pointer group" onclick="document.getElementById('service-select').value='Heating'; window.location.href='#contact';">
+                    <div class="md:col-span-2">
+                        <span class="font-mono text-6xl md:text-7xl lg:text-8xl text-graphite/20 font-bold group-hover:text-copper transition-colors">02</span>
+                    </div>
+                    <div class="md:col-span-5 flex flex-col">
+                        <h3 class="font-display text-2xl md:text-3xl font-bold uppercase text-graphite mb-4">Heating Systems</h3>
+                        <p class="text-graphite/70 mb-6 font-light">Heating-system work focused on addressing equipment issues and identifying suitable service options.</p>
+                        <span class="font-mono font-semibold tracking-widest text-sm flex items-center text-graphite">
+                            DISCUSS THIS SERVICE
+                            <svg class="w-4 h-4 ml-2 service-arrow" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="square" stroke-linejoin="miter" stroke-width="2" d="M4 4h16v16M20 4L4 20"></path></svg>
+                        </span>
+                    </div>
+                    <div class="md:col-span-5 h-48 md:h-64 img-wrap border border-graphite/20">
+                        <img src="https://raw.githubusercontent.com/CreativeTugsDotCom/PL/refs/heads/main/Screenshot%202026-10-12%20232043.png" alt="Heating system components" class="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-500">
+                    </div>
+                </div>
+
+                <!-- Service 03 -->
+                <div class="service-row py-10 md:py-16 grid grid-cols-1 md:grid-cols-12 gap-8 items-center cursor-pointer group" onclick="document.getElementById('service-select').value='Installation'; window.location.href='#contact';">
+                    <div class="md:col-span-2">
+                        <span class="font-mono text-6xl md:text-7xl lg:text-8xl text-graphite/20 font-bold group-hover:text-copper transition-colors">03</span>
+                    </div>
+                    <div class="md:col-span-5 flex flex-col">
+                        <h3 class="font-display text-2xl md:text-3xl font-bold uppercase text-graphite mb-4">HVAC Installation & Replacement</h3>
+                        <p class="text-graphite/70 mb-6 font-light">Planning equipment replacement or an installation project? Discuss the requirements of your building and the appropriate next steps.</p>
+                        <span class="font-mono font-semibold tracking-widest text-sm flex items-center text-graphite">
+                            DISCUSS THIS SERVICE
+                            <svg class="w-4 h-4 ml-2 service-arrow" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="square" stroke-linejoin="miter" stroke-width="2" d="M4 4h16v16M20 4L4 20"></path></svg>
+                        </span>
+                    </div>
+                    <div class="md:col-span-5 h-48 md:h-64 img-wrap border border-graphite/20">
+                        <img src="https://raw.githubusercontent.com/CreativeTugsDotCom/PL/refs/heads/main/Screenshot%202026-10-14%20033057.png" alt="Mechanical equipment setup" class="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-500">
+                    </div>
+                </div>
+
+                <!-- Service 04 -->
+                <div class="service-row py-10 md:py-16 grid grid-cols-1 md:grid-cols-12 gap-8 items-center cursor-pointer group" onclick="document.getElementById('service-select').value='Ductwork'; window.location.href='#contact';">
+                    <div class="md:col-span-2">
+                        <span class="font-mono text-6xl md:text-7xl lg:text-8xl text-graphite/20 font-bold group-hover:text-copper transition-colors">04</span>
+                    </div>
+                    <div class="md:col-span-5 flex flex-col">
+                        <h3 class="font-display text-2xl md:text-3xl font-bold uppercase text-graphite mb-4">Ductwork & Commercial Projects</h3>
+                        <p class="text-graphite/70 mb-6 font-light">Mechanical project work involving HVAC equipment, ductwork, and related installation requirements.</p>
+                        <span class="font-mono font-semibold tracking-widest text-sm flex items-center text-graphite">
+                            DISCUSS THIS SERVICE
+                            <svg class="w-4 h-4 ml-2 service-arrow" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="square" stroke-linejoin="miter" stroke-width="2" d="M4 4h16v16M20 4L4 20"></path></svg>
+                        </span>
+                    </div>
+                    <div class="md:col-span-5 h-48 md:h-64 img-wrap border border-graphite/20">
+                        <img src="https://raw.githubusercontent.com/CreativeTugsDotCom/PL/refs/heads/main/Screenshot%202026-10-13%20005111.png" alt="Sheet metal ductwork installation" class="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-500">
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- VISUAL SIGNATURE (Technical System) -->
+    <section class="py-24 bg-graphite bg-grid-dark relative overflow-hidden border-y border-steel/20">
+        <div class="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+                
+                <div class="order-2 lg:order-1">
+                    <h2 class="font-display text-4xl md:text-5xl font-bold uppercase text-mineral mb-6">Every Component<br><span class="text-copper">Has A Job.</span></h2>
+                    <p class="text-steel text-lg font-light max-w-md mb-8">
+                        HVAC equipment and the mechanical systems around it need to work together to support comfortable indoor conditions. Precision in layout and installation matters.
+                    </p>
+                    <div class="flex gap-4 mb-4">
+                        <div class="w-3 h-3 bg-mineral"></div>
+                        <div class="w-3 h-3 bg-copper"></div>
+                        <div class="w-3 h-3 bg-yellow"></div>
+                    </div>
+                    <span class="font-mono text-xs text-steel tracking-widest uppercase">Schematic View // simplified</span>
+                </div>
+
+                <div class="order-1 lg:order-2 relative aspect-square md:aspect-video lg:aspect-square w-full max-w-2xl mx-auto border border-steel/20 p-8 bg-graphite/50 backdrop-blur-sm shadow-2xl reveal-box animate-on-scroll">
+                    <!-- Technical Grid Lines inside graphic -->
+                    <div class="absolute inset-0 bg-grid-dark opacity-50 pointer-events-none"></div>
+                    
+                    <!-- SVG Mechanical Illustration -->
+                    <svg viewBox="0 0 400 400" class="w-full h-full drop-shadow-lg" id="mech-svg">
+                        <defs>
+                            <pattern id="diagonalHatch" patternUnits="userSpaceOnUse" width="4" height="4">
+                              <path d="M-1,1 l2,-2 M0,4 l4,-4 M3,5 l2,-2" style="stroke:#8D999C; stroke-width:0.5;" />
+                            </pattern>
+                        </defs>
+                        
+                        <!-- Connecting Pipes/Ducts -->
+                        <path d="M 80 280 L 80 150 L 250 150" fill="none" stroke="#8D999C" stroke-width="8" stroke-linejoin="bevel" class="draw-line animate-on-scroll" />
+                        <path d="M 250 150 L 250 80 L 320 80" fill="none" stroke="#B86D4B" stroke-width="4" stroke-linejoin="bevel" class="draw-line animate-on-scroll" style="animation-delay: 0.5s;" />
+                        <path d="M 280 280 L 280 200 L 320 200" fill="none" stroke="#E7C957" stroke-width="2" stroke-linejoin="bevel" stroke-dasharray="4 4" class="draw-line animate-on-scroll" style="animation-delay: 1s;" />
+
+                        <!-- Outdoor Condenser Unit -->
+                        <rect x="40" y="280" width="80" height="90" fill="transparent" stroke="#E9E8E2" stroke-width="2" />
+                        <rect x="50" y="290" width="60" height="70" fill="url(#diagonalHatch)" stroke="#8D999C" stroke-width="1" />
+                        <circle cx="80" cy="325" r="25" fill="none" stroke="#8D999C" stroke-width="2" />
+                        <circle cx="80" cy="325" r="5" fill="#E9E8E2" />
+                        <text x="40" y="385" font-family="monospace" font-size="10" fill="#8D999C">EXT-01</text>
+
+                        <!-- Indoor Air Handler / Furnace -->
+                        <rect x="220" y="280" width="100" height="90" fill="transparent" stroke="#E9E8E2" stroke-width="2" />
+                        <rect x="230" y="290" width="80" height="30" fill="#272B2D" stroke="#B86D4B" stroke-width="1" />
+                        <line x1="230" y1="340" x2="310" y2="340" stroke="#8D999C" stroke-width="2" stroke-dasharray="5 2" />
+                        <text x="220" y="385" font-family="monospace" font-size="10" fill="#8D999C">INT-AHU</text>
+
+                        <!-- Ductwork Vents -->
+                        <polygon points="320,70 360,70 350,90 320,90" fill="#E9E8E2" opacity="0.8" />
+                        <polygon points="320,190 350,190 340,210 320,210" fill="#E9E8E2" opacity="0.4" />
+                        
+                        <!-- Directional Arrows -->
+                        <path d="M 160 145 L 170 150 L 160 155 Z" fill="#E7C957" />
+                        <path d="M 285 110 L 290 120 L 280 120 Z" fill="#E7C957" transform="rotate(90 285 115)" />
+                        
+                        <!-- Measurements/Labels -->
+                        <line x1="30" y1="280" x2="30" y2="370" stroke="#8D999C" stroke-width="1" />
+                        <line x1="25" y1="280" x2="35" y2="280" stroke="#8D999C" stroke-width="1" />
+                        <line x1="25" y1="370" x2="35" y2="370" stroke="#8D999C" stroke-width="1" />
+                    </svg>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- PROJECT GALLERY -->
+    <section id="gallery" class="py-24 bg-mineral relative">
+        <div class="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8">
+            
+            <div class="mb-12 flex justify-between items-end border-b border-graphite/20 pb-4">
+                <h2 class="font-display text-3xl md:text-4xl font-bold uppercase text-graphite tracking-tight">Mechanical Work<br><span class="text-steel font-mono text-xl tracking-widest">/ Selected Projects</span></h2>
+            </div>
+
+            <!-- CSS Grid Gallery -->
+            <div class="grid grid-cols-1 md:grid-cols-4 md:grid-rows-3 gap-4 md:gap-6 md:h-[800px]">
+                
+                <!-- Item 1 (Large Featured) -->
+                <div class="md:col-span-2 md:row-span-2 img-wrap relative group cursor-pointer border border-graphite/10" onclick="openLightbox('https://raw.githubusercontent.com/CreativeTugsDotCom/ssw/refs/heads/main/Screenshot%202026-10-14%20044537.png', 'Commercial Mechanical Installation')">
+                    <img src="https://raw.githubusercontent.com/CreativeTugsDotCom/ssw/refs/heads/main/Screenshot%202026-10-14%20044537.png" alt="Commercial HVAC Installation" class="w-full h-full object-cover">
+                    <div class="absolute inset-0 bg-graphite/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-6">
+                        <div>
+                            <span class="font-mono text-yellow text-sm tracking-widest uppercase">01 / Commercial</span>
+                            <h4 class="font-display text-mineral text-xl font-bold uppercase mt-1">Mechanical Equipment</h4>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Item 2 (Small Horizontal) -->
+                <div class="md:col-span-1 md:row-span-1 img-wrap relative group cursor-pointer border border-graphite/10" onclick="openLightbox('https://raw.githubusercontent.com/CreativeTugsDotCom/ssw/refs/heads/main/Screenshot%202026-10-14%20044649.png', 'Ductwork Detailing')">
+                    <img src="https://raw.githubusercontent.com/CreativeTugsDotCom/ssw/refs/heads/main/Screenshot%202026-10-14%20044649.png" alt="Ductwork" class="w-full h-full object-cover grayscale">
+                    <div class="absolute inset-0 bg-copper/60 mix-blend-multiply opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                    <div class="absolute bottom-4 left-4 opacity-0 group-hover:opacity-100 transition-opacity">
+                        <span class="font-mono text-mineral text-xs tracking-widest uppercase bg-graphite px-2 py-1">Ductwork</span>
+                    </div>
+                </div>
+
+                <!-- Item 3 (Small Horizontal) -->
+                <div class="md:col-span-1 md:row-span-1 img-wrap relative group cursor-pointer border border-graphite/10" onclick="openLightbox('https://raw.githubusercontent.com/CreativeTugsDotCom/ssw/refs/heads/main/Screenshot%202026-10-14%20044726.png', 'System Components')">
+                    <img src="https://raw.githubusercontent.com/CreativeTugsDotCom/ssw/refs/heads/main/Screenshot%202026-10-14%20044726.png" alt="System components" class="w-full h-full object-cover">
+                    <div class="absolute bottom-4 left-4 opacity-0 group-hover:opacity-100 transition-opacity">
+                        <span class="font-mono text-mineral text-xs tracking-widest uppercase bg-graphite px-2 py-1">Components</span>
+                    </div>
+                </div>
+
+                <!-- Item 4 (Tall) -->
+                <div class="md:col-span-1 md:row-span-2 md:col-start-3 md:row-start-2 img-wrap relative group cursor-pointer border border-graphite/10" onclick="openLightbox('https://raw.githubusercontent.com/CreativeTugsDotCom/ssw/refs/heads/main/Screenshot%202026-10-14%20044915.png', 'Residential HVAC Service')">
+                    <img src="https://raw.githubusercontent.com/CreativeTugsDotCom/ssw/refs/heads/main/Screenshot%202026-10-14%20044915.png" alt="Residential AC Unit" class="w-full h-full object-cover">
+                    <div class="absolute inset-0 bg-graphite/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-6">
+                        <div>
+                            <span class="font-mono text-yellow text-sm tracking-widest uppercase">02 / Residential</span>
+                            <h4 class="font-display text-mineral text-lg font-bold uppercase mt-1">HVAC Service</h4>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Item 5 (Wide Bottom) -->
+                <div class="md:col-span-2 md:row-span-1 md:col-start-1 md:row-start-3 img-wrap relative group cursor-pointer border border-graphite/10" onclick="openLightbox('https://raw.githubusercontent.com/CreativeTugsDotCom/ssw/refs/heads/main/Screenshot%202026-10-14%20044952.png', 'Commercial Ventilation Setup')">
+                    <img src="https://raw.githubusercontent.com/CreativeTugsDotCom/ssw/refs/heads/main/Screenshot%202026-10-14%20044952.png" alt="Commercial roof units" class="w-full h-full object-cover">
+                    <div class="absolute inset-0 bg-graphite/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                        <span class="font-display bg-yellow text-graphite px-4 py-2 font-bold uppercase tracking-wider text-sm flex items-center">
+                            View Detail <svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="square" stroke-linejoin="miter" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                        </span>
+                    </div>
+                </div>
+                
+                <!-- Decorative Empty Grid Block -->
+                <div class="hidden md:flex md:col-span-1 md:row-span-1 md:col-start-4 md:row-start-3 bg-mineral border border-graphite/10 items-center justify-center p-6 text-center">
+                     <p class="font-mono text-steel text-sm tracking-widest uppercase">Houston, TX<br>Operating Region</p>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- BUSINESS INTRO -->
+    <section id="about" class="py-24 bg-graphite text-mineral border-y border-mineral/10 relative overflow-hidden">
+        <div class="absolute right-0 top-0 w-1/3 h-full bg-grid-dark opacity-20 pointer-events-none"></div>
+        <div class="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+                
+                <div class="lg:col-span-6 lg:pr-12">
+                    <h2 class="font-display text-4xl md:text-5xl font-bold uppercase mb-6 leading-tight">
+                        Technical Work.<br>
+                        <span class="text-copper">A Clearer Way Forward.</span>
+                    </h2>
+                    <div class="w-12 h-1 bg-yellow mb-8"></div>
+                    <p class="text-mineral/80 font-light text-lg mb-6">
+                        Strife's Air Conditioning & Heating is listed as an HVAC and mechanical contractor serving the Houston area. Public project records include mechanical and HVAC work, air-conditioning and ductwork installations, and commercial ventilation-related projects.
+                    </p>
+                    <p class="text-mineral/60 font-light text-sm italic">
+                        *Business details reflect available public profiles and municipal records.
+                    </p>
+                </div>
+
+                <div class="lg:col-span-5 lg:col-start-8 reveal-box animate-on-scroll">
+                    <div class="aspect-square bg-mineral border border-steel relative p-2">
+                        <img src="https://images.unsplash.com/photo-1503602642458-232111445657?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Technical tools" class="w-full h-full object-cover grayscale">
+                        <div class="absolute -bottom-6 -left-6 w-24 h-24 bg-yellow flex items-center justify-center border-2 border-graphite">
+                            <svg class="w-10 h-10 text-graphite" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="square" stroke-linejoin="miter" stroke-width="1.5" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="square" stroke-linejoin="miter" stroke-width="1.5" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- PROJECT DECISION SECTION -->
+    <section class="py-20 bg-mineral relative border-b border-graphite/10">
+        <div class="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            
+            <h2 class="font-display text-3xl md:text-4xl font-bold uppercase text-graphite tracking-tight mb-12">What Are You Planning?</h2>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <!-- Option 1 -->
+                <button onclick="selectProject('Fix System')" class="group flex flex-col items-center p-8 border-2 border-graphite/20 hover:border-copper bg-white hover:bg-mineral transition-all focus:outline-none focus:ring-2 focus:ring-yellow">
+                    <div class="w-16 h-16 bg-graphite/5 rounded-full flex items-center justify-center mb-6 group-hover:bg-copper/10 transition-colors">
+                        <svg class="w-8 h-8 text-graphite group-hover:text-copper transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="square" stroke-linejoin="miter" stroke-width="1.5" d="M11 4a2 2 0 114 0v1a1 1 0 001 1h3a1 1 0 011 1v3a1 1 0 01-1 1h-1a2 2 0 100 4h1a1 1 0 011 1v3a1 1 0 01-1 1h-3a1 1 0 01-1-1v-1a2 2 0 10-4 0v1a1 1 0 01-1 1H7a1 1 0 01-1-1v-3a1 1 0 00-1-1H4a2 2 0 110-4h1a1 1 0 001-1V7a1 1 0 011-1h3a1 1 0 001-1V4z"></path></svg>
+                    </div>
+                    <h3 class="font-display font-bold uppercase text-lg text-graphite mb-2">Fix An Existing System</h3>
+                    <p class="text-sm text-graphite/70 font-light">For visitors experiencing an HVAC problem or needing service.</p>
+                </button>
+
+                <!-- Option 2 -->
+                <button onclick="selectProject('Install/Replace')" class="group flex flex-col items-center p-8 border-2 border-graphite/20 hover:border-copper bg-white hover:bg-mineral transition-all focus:outline-none focus:ring-2 focus:ring-yellow">
+                    <div class="w-16 h-16 bg-graphite/5 rounded-full flex items-center justify-center mb-6 group-hover:bg-copper/10 transition-colors">
+                        <svg class="w-8 h-8 text-graphite group-hover:text-copper transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="square" stroke-linejoin="miter" stroke-width="1.5" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg>
+                    </div>
+                    <h3 class="font-display font-bold uppercase text-lg text-graphite mb-2">Install Or Replace</h3>
+                    <p class="text-sm text-graphite/70 font-light">For visitors planning a new installation or equipment replacement.</p>
+                </button>
+
+                <!-- Option 3 -->
+                <button onclick="selectProject('Commercial')" class="group flex flex-col items-center p-8 border-2 border-graphite/20 hover:border-copper bg-white hover:bg-mineral transition-all focus:outline-none focus:ring-2 focus:ring-yellow">
+                    <div class="w-16 h-16 bg-graphite/5 rounded-full flex items-center justify-center mb-6 group-hover:bg-copper/10 transition-colors">
+                        <svg class="w-8 h-8 text-graphite group-hover:text-copper transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="square" stroke-linejoin="miter" stroke-width="1.5" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path></svg>
+                    </div>
+                    <h3 class="font-display font-bold uppercase text-lg text-graphite mb-2">Discuss Commercial</h3>
+                    <p class="text-sm text-graphite/70 font-light">For enquiries about commercial mechanical work or ductwork.</p>
+                </button>
+            </div>
+
+        </div>
+    </section>
+
+    <!-- CONTACT SECTION -->
+    <section id="contact" class="flex flex-col lg:flex-row bg-mineral border-b border-graphite/20 relative">
+        
+        <!-- Left: Info (Graphite) -->
+        <div class="w-full lg:w-5/12 bg-graphite text-mineral p-10 md:p-16 lg:p-24 flex flex-col justify-center relative overflow-hidden">
+            <div class="absolute top-0 right-0 p-6 pointer-events-none opacity-20">
+                <svg width="100" height="100" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <circle cx="50" cy="50" r="49" stroke="#E9E8E2" stroke-width="2" stroke-dasharray="4 4"/>
+                    <line x1="50" y1="0" x2="50" y2="100" stroke="#E9E8E2" stroke-width="1"/>
+                    <line x1="0" y1="50" x2="100" y2="50" stroke="#E9E8E2" stroke-width="1"/>
+                </svg>
+            </div>
+
+            <h2 class="font-display text-4xl md:text-5xl font-bold uppercase mb-6 relative z-10">Let's Talk<br>About The Job.</h2>
+            <p class="text-steel font-light text-lg mb-12 relative z-10 max-w-sm">
+                Tell us a little about your HVAC needs and contact Strife's to discuss the next step.
+            </p>
+
+            <div class="space-y-8 relative z-10">
+                <div>
+                    <span class="block font-mono text-yellow text-sm tracking-widest uppercase mb-1">Direct Line</span>
+                    <a href="tel:+12817415548" class="font-display text-3xl font-bold hover:text-copper transition-colors">+1 281-741-5548</a>
+                </div>
+                
+                <div>
+                    <span class="block font-mono text-yellow text-sm tracking-widest uppercase mb-1">Location</span>
+                    <a href="https://www.google.com/maps/place/Strife's+Air+Conditioning+and+Heating/@29.836095,-95.7907798,10z/data=!4m6!3m5!1s0x8640dd4872295555:0x58daad6bd97f5b8b!8m2!3d29.836095!4d-95.46119!16s%2Fg%2F11hcz3b570" target="_blank" rel="noopener noreferrer" class="font-sans text-lg hover:text-copper transition-colors flex items-start">
+                        Houston, Texas<br>
+                        <span class="text-sm text-steel mt-1 underline decoration-steel/50 hover:decoration-copper flex items-center">Open in Maps <svg class="w-3 h-3 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="square" stroke-linejoin="miter" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg></span>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right: Form (Mineral White) -->
+        <div class="w-full lg:w-7/12 bg-mineral p-10 md:p-16 lg:p-24 relative crosshair-tl crosshair-tr crosshair-bl crosshair-br">
+            <form id="contact-form" class="max-w-2xl" onsubmit="submitForm(event)">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
+                    <div>
+                        <label for="name" class="block font-mono text-graphite/60 text-sm tracking-widest uppercase mb-1">Name</label>
+                        <input type="text" id="name" required class="mech-input" placeholder="Your full name">
+                    </div>
+                    <div>
+                        <label for="phone" class="block font-mono text-graphite/60 text-sm tracking-widest uppercase mb-1">Phone</label>
+                        <input type="tel" id="phone" required class="mech-input" placeholder="(123) 456-7890">
+                    </div>
+                </div>
+
+                <div class="mb-8">
+                    <label for="email" class="block font-mono text-graphite/60 text-sm tracking-widest uppercase mb-1">Email Address</label>
+                    <input type="email" id="email" required class="mech-input" placeholder="email@example.com">
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
+                    <div>
+                        <label for="property-type" class="block font-mono text-graphite/60 text-sm tracking-widest uppercase mb-1">Property Type</label>
+                        <select id="property-type" required class="mech-input cursor-pointer appearance-none bg-transparent">
+                            <option value="" disabled selected>Select property type</option>
+                            <option value="Residential">Residential</option>
+                            <option value="Commercial">Commercial</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="service-select" class="block font-mono text-graphite/60 text-sm tracking-widest uppercase mb-1">Service Needed</label>
+                        <select id="service-select" required class="mech-input cursor-pointer appearance-none bg-transparent">
+                            <option value="" disabled selected>Select a service</option>
+                            <option value="Fix System">Fix Existing System</option>
+                            <option value="AC Service">Air Conditioning Service</option>
+                            <option value="Heating">Heating Systems</option>
+                            <option value="Install/Replace">HVAC Installation/Replacement</option>
+                            <option value="Ductwork">Ductwork</option>
+                            <option value="Commercial">Commercial Mechanical</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="mb-10">
+                    <label for="description" class="block font-mono text-graphite/60 text-sm tracking-widest uppercase mb-1">Description of Work</label>
+                    <textarea id="description" rows="4" required class="mech-input resize-none" placeholder="Briefly describe the issue or project..."></textarea>
+                </div>
+
+                <!-- Form Message Box (Hidden by default) -->
+                <div id="form-message" class="hidden mb-6 p-4 border border-graphite/20 bg-mineral text-sm font-mono tracking-wide"></div>
+
+                <button type="submit" class="w-full md:w-auto bg-graphite text-mineral font-display font-bold uppercase tracking-widest py-4 px-12 hover:bg-copper transition-colors flex justify-center items-center group">
+                    Submit Request
+                    <svg class="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="square" stroke-linejoin="miter" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+                </button>
+            </form>
+        </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer class="bg-graphite pt-16 pb-8 border-t-4 border-yellow relative overflow-hidden">
+        <div class="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-12 md:gap-8 mb-16">
+                
+                <!-- Brand -->
+                <div class="col-span-1 md:col-span-1">
+                    <a href="#" class="block font-display font-bold text-2xl tracking-tighter uppercase text-mineral mb-4">
+                        STRIFE'S<span class="text-copper">.</span>
+                        <span class="block text-[0.65rem] font-mono tracking-widest text-steel mt-[-4px]">AC & HEATING</span>
+                    </a>
+                    <p class="text-steel font-light text-sm max-w-xs">
+                        Professional HVAC and mechanical services built around better comfort.
+                    </p>
+                </div>
+
+                <!-- Navigation -->
+                <div>
+                    <h4 class="font-mono text-yellow text-sm tracking-widest uppercase mb-4">Navigation</h4>
+                    <ul class="space-y-2">
+                        <li><a href="#services" class="text-mineral/80 hover:text-white text-sm font-light transition-colors">Services Index</a></li>
+                        <li><a href="#gallery" class="text-mineral/80 hover:text-white text-sm font-light transition-colors">Project Gallery</a></li>
+                        <li><a href="#about" class="text-mineral/80 hover:text-white text-sm font-light transition-colors">Business Profile</a></li>
+                        <li><a href="#contact" class="text-mineral/80 hover:text-white text-sm font-light transition-colors">Contact Us</a></li>
+                    </ul>
+                </div>
+
+                <!-- Services Links -->
+                <div>
+                    <h4 class="font-mono text-yellow text-sm tracking-widest uppercase mb-4">Services</h4>
+                    <ul class="space-y-2">
+                        <li><a href="#" onclick="selectProject('AC Service')" class="text-mineral/80 hover:text-white text-sm font-light transition-colors">Air Conditioning</a></li>
+                        <li><a href="#" onclick="selectProject('Heating')" class="text-mineral/80 hover:text-white text-sm font-light transition-colors">Heating Systems</a></li>
+                        <li><a href="#" onclick="selectProject('Install/Replace')" class="text-mineral/80 hover:text-white text-sm font-light transition-colors">HVAC Installation</a></li>
+                        <li><a href="#" onclick="selectProject('Ductwork')" class="text-mineral/80 hover:text-white text-sm font-light transition-colors">Ductwork</a></li>
+                    </ul>
+                </div>
+
+                <!-- Contact Info -->
+                <div>
+                    <h4 class="font-mono text-yellow text-sm tracking-widest uppercase mb-4">Contact</h4>
+                    <a href="tel:+12817415548" class="block text-mineral font-display text-xl mb-2 hover:text-copper transition-colors">+1 281-741-5548</a>
+                    <a href="https://www.google.com/maps/place/Strife's+Air+Conditioning+and+Heating/@29.836095,-95.7907798,10z/data=!4m6!3m5!1s0x8640dd4872295555:0x58daad6bd97f5b8b!8m2!3d29.836095!4d-95.46119!16s%2Fg%2F11hcz3b570" target="_blank" rel="noopener noreferrer" class="text-mineral/80 hover:text-white text-sm font-light transition-colors underline decoration-steel/50">
+                        Houston, Texas
+                    </a>
+                </div>
+
+            </div>
+
+            <!-- Bottom Bar -->
+            <div class="pt-8 border-t border-steel/20 flex flex-col md:flex-row justify-between items-center gap-4">
+                <p class="text-steel text-xs font-mono tracking-wider">
+                    &copy; <script>document.write(new Date().getFullYear())</script> Strife's Air Conditioning & Heating. All rights reserved.
+                </p>
+                <!-- Decorative Graphic Accent -->
+                <svg class="w-6 h-6 text-yellow" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="square" stroke-linejoin="miter" stroke-width="2" d="M13 5l7 7-7 7M5 5l7 7-7 7"></path></svg>
+            </div>
+        </div>
+    </footer>
+
+    <!-- LIGHTBOX OVERLAY -->
+    <div id="lightbox" class="fixed inset-0 z-[100] bg-graphite/95 backdrop-blur-sm flex items-center justify-center p-4 md:p-12">
+        <button onclick="closeLightbox()" class="absolute top-6 right-6 text-mineral hover:text-yellow focus:outline-none p-2">
+            <span class="sr-only">Close</span>
+            <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="square" stroke-linejoin="miter" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+        </button>
+        <div class="max-w-6xl w-full max-h-full flex flex-col items-center">
+            <img id="lightbox-img" src="" alt="Project Image" class="max-w-full max-h-[80vh] object-contain border border-mineral/20 shadow-2xl">
+            <p id="lightbox-caption" class="mt-4 text-mineral font-mono tracking-widest text-sm uppercase bg-graphite px-4 py-2 border border-steel/30"></p>
+        </div>
+    </div>
+
+    <!-- JAVASCRIPT LOGIC -->
+    <script>
+        // Mobile Menu Toggle
+        const btn = document.getElementById('mobile-menu-btn');
+        const menu = document.getElementById('mobile-menu');
+        const mobileLinks = document.querySelectorAll('.mobile-link');
+
+        btn.addEventListener('click', () => {
+            menu.classList.toggle('hidden');
+        });
+
+        mobileLinks.forEach(link => {
+            link.addEventListener('click', () => {
+                menu.classList.add('hidden');
+            });
+        });
+
+        // Sticky Header Shrink
+        const header = document.getElementById('main-header');
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 50) {
+                header.classList.add('scrolled');
+            } else {
+                header.classList.remove('scrolled');
+            }
+        });
+
+        // Project Selection Logic (Scrolls to form & selects option)
+        function selectProject(optionValue) {
+            const selectEl = document.getElementById('service-select');
+            const contactSection = document.getElementById('contact');
+            
+            // Map generic buttons to form options if needed, or use exact values
+            const validOptions = Array.from(selectEl.options).map(opt => opt.value);
+            
+            if (validOptions.includes(optionValue)) {
+                selectEl.value = optionValue;
+            } else {
+                 // Fallback mapping if values don't match exactly
+                 if(optionValue === 'Fix System') selectEl.value = 'Fix System';
+                 if(optionValue === 'Install/Replace') selectEl.value = 'Install/Replace';
+                 if(optionValue === 'Commercial') selectEl.value = 'Commercial';
+            }
+
+            // Highlight field briefly
+            selectEl.parentElement.classList.add('animate-pulse');
+            setTimeout(() => selectEl.parentElement.classList.remove('animate-pulse'), 1000);
+
+            contactSection.scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // Lightbox Logic
+        const lightbox = document.getElementById('lightbox');
+        const lightboxImg = document.getElementById('lightbox-img');
+        const lightboxCaption = document.getElementById('lightbox-caption');
+
+        function openLightbox(src, caption) {
+            lightboxImg.src = src;
+            lightboxCaption.textContent = caption;
+            lightbox.classList.add('active');
+            document.body.style.overflow = 'hidden'; // Prevent scrolling background
+        }
+
+        function closeLightbox() {
+            lightbox.classList.remove('active');
+            setTimeout(() => { lightboxImg.src = ''; }, 300); // Clear after fade
+            document.body.style.overflow = '';
+        }
+
+        // Close lightbox on click outside image or Escape key
+        lightbox.addEventListener('click', (e) => {
+            if (e.target === lightbox) closeLightbox();
+        });
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && lightbox.classList.contains('active')) closeLightbox();
+        });
+
+        // Form Submission Logic
+        function submitForm(event) {
+            event.preventDefault();
+            const form = event.target;
+            const msgBox = document.getElementById('form-message');
+            const btn = form.querySelector('button[type="submit"]');
+
+            // Visual feedback
+            const originalText = btn.innerHTML;
+            btn.innerHTML = 'PROCESSING...';
+            btn.disabled = true;
+
+            // Simulate backend request
+            setTimeout(() => {
+                // Success state
+                msgBox.classList.remove('hidden');
+                msgBox.classList.add('border-yellow', 'text-graphite');
+                msgBox.innerHTML = `
+                    <strong class="block mb-1">REQUEST LOGGED</strong>
+                    Thank you. We have received your inquiry. A team member will contact you shortly regarding your HVAC needs.<br>
+                    <span class="text-xs text-steel mt-2 block">*Note: System integration required for live message routing.</span>
+                `;
+                
+                form.reset();
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+
+                // Hide message after a while
+                setTimeout(() => {
+                    msgBox.classList.add('hidden');
+                }, 8000);
+
+            }, 1500);
+        }
+
+        // Intersection Observer for scroll animations (Reveals & Line Drawing)
+        const observerOptions = {
+            root: null,
+            rootMargin: '0px',
+            threshold: 0.15
+        };
+
+        const observer = new IntersectionObserver((entries, observer) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    // Handle box reveals
+                    if (entry.target.classList.contains('reveal-box')) {
+                        entry.target.classList.add('active');
+                    }
+                    // Handle SVG line drawing
+                    if (entry.target.classList.contains('draw-line')) {
+                        entry.target.classList.add('animate-draw');
+                    }
+                    observer.unobserve(entry.target); // Only animate once
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('.reveal-box, .draw-line').forEach(el => {
+            observer.observe(el);
+        });
+
+    </script>
+</body>
+</html>
